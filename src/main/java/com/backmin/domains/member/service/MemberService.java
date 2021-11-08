@@ -2,6 +2,7 @@ package com.backmin.domains.member.service;
 
 import com.backmin.config.exception.BusinessException;
 import com.backmin.config.util.AssertThrow;
+import com.backmin.domains.common.dto.ApiResult;
 import com.backmin.domains.common.enums.ErrorInfo;
 import com.backmin.domains.member.converter.MemberConverter;
 import com.backmin.domains.member.domain.Member;
@@ -34,19 +35,11 @@ public class MemberService {
 
     @Transactional
     public void update(Long memberId, MemberUpdateParam memberUpdateParam) {
-        memberRepository.findById(memberId)
-                .map(member -> memberConverter.convertUpdateDtoToMember(member, memberUpdateParam))
-                .orElseThrow(() -> new BusinessException(ErrorInfo.MEMBER_NOT_FOUND));
-    }
-
-    public MemberCreateParam findOne(Long id) {
-        return memberRepository.findById(id)
-                .map(memberConverter::convertMemberToSaveDto)
-                .orElseThrow(() -> new BusinessException(ErrorInfo.MEMBER_NOT_FOUND));
-    }
-
-    public Page<MemberCreateParam> findAll(Pageable pageable) {
-        return memberRepository.findAll(pageable).map(memberConverter::convertMemberToSaveDto);
+        if (authenticateMember(memberId, memberUpdateParam.getEmail(), memberUpdateParam.getPassword())) {
+            memberRepository.findById(memberId)
+                    .map(member -> memberConverter.convertUpdateDtoToMember(member, memberUpdateParam))
+                    .orElseThrow(() -> new BusinessException(ErrorInfo.MEMBER_NOT_FOUND));
+        }
     }
 
     @Transactional

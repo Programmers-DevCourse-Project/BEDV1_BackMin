@@ -8,19 +8,19 @@ import lombok.Setter;
 @Setter
 public class MemberCreateParam {
 
-    @NotBlank
+    @NotBlank(message = "올바른 형식의 이메일을 입력해주세요")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "올바른 형식의 패스워드를 입력해주세요")
     private String password;
 
-    @NotBlank
+    @NotBlank(message = "올바른 형식의 비밀번호를 입력해주세요")
     private String phoneNumber;
 
-    @NotBlank
+    @NotBlank(message = "올바른 형식의 닉네임을 입력해주세요")
     private String nickName;
 
-    @NotBlank
+    @NotBlank(message = "올바른 형식의 주소를 입력해주세요")
     private String address;
 
 }

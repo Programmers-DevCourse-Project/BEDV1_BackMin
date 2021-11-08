@@ -1,5 +1,6 @@
 package com.backmin.domains.common.dto;
 
+import com.backmin.domains.common.enums.ErrorInfo;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -36,6 +37,10 @@ public class ApiResult<T> {
 
     public static ApiResult error(String code, Object message) {
         return new ApiResult(false, new ApiError(code, message));
+    }
+
+    public static ApiResult error(ErrorInfo errorInfo) {
+        return new ApiResult(false, new ApiError(errorInfo.getCode(), errorInfo.getMessage()));
     }
 
 }

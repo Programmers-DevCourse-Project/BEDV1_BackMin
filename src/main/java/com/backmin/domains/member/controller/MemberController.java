@@ -33,10 +33,7 @@ public class MemberController {
 
     @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResult updateMember(@PathVariable("id") Long memberId, @RequestBody @Valid MemberUpdateParam memberUpdateParam) {
-        if (memberService.authenticateMember(memberId, memberUpdateParam.getEmail(), memberUpdateParam.getPassword())) {
-            memberService.update(memberId, memberUpdateParam);
-            return ApiResult.ok();
-        }
+        memberService.update(memberId, memberUpdateParam);
         throw new BusinessException(ErrorInfo.INCORRECT_MEMBER_SECURITY);
     }
 

@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiResult<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    public ApiResult handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         log.error("{}", ex); /** todo: 에러 로그를 얼마나 찍어야하는지? */
         return ApiResult.error("METHOD_ARG_NOT_VALID", ex.getBindingResult().getAllErrors().stream()
                 .collect(Collectors.toMap(error -> ((FieldError) error).getField(), ObjectError::getDefaultMessage)));
@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiResult<?> handleBusinessExceptionException(BusinessException ex) {
+    public ApiResult handleBusinessExceptionException(BusinessException ex) {
         log.error("{}", ex);
         ErrorInfo errorInfo = ex.getErrorInfo();
         return ApiResult.error(errorInfo.getCode(), errorInfo.getMessage());
