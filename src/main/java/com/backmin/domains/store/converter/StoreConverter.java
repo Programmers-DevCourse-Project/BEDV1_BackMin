@@ -1,11 +1,13 @@
 package com.backmin.domains.store.converter;
 
+import com.backmin.domains.common.dto.PageResult;
 import com.backmin.domains.menu.dto.response.BestMenuResult;
 import com.backmin.domains.menu.dto.response.StoreMenuReadResult;
 import com.backmin.domains.store.domain.Store;
 import com.backmin.domains.store.dto.response.StoreReadResult;
 import com.backmin.domains.store.dto.response.StoresReadResult;
 import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -43,6 +45,16 @@ public class StoreConverter {
         storeReadResult.setBestMenus(bestMenuResults);
         storeReadResult.setMenus(menuResult);
         return storeReadResult;
+    }
+
+    public PageResult<StoresReadResult> convertToPageResult(Page<Store> findStores, List<StoresReadResult> pagingStore) {
+        PageResult<StoresReadResult> pageResult = new PageResult<>();
+        pageResult.setList(pagingStore);
+        pageResult.setHasNext(findStores.hasNext());
+        pageResult.setPageSize(findStores.getSize());
+        pageResult.setPageNumber(findStores.getNumber());
+        pageResult.setTotalCount(findStores.getTotalElements());
+        return pageResult;
     }
 
 }

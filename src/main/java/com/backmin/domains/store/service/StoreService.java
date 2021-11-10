@@ -43,13 +43,7 @@ public class StoreService {
     }
 
     private PageResult<StoresReadResult> createPageResult(Page<Store> findStores) {
-        PageResult<StoresReadResult> pageResult = new PageResult<>();
-        pageResult.setList(createPagingStore(findStores));
-        pageResult.setHasNext(findStores.hasNext());
-        pageResult.setPageSize(findStores.getSize());
-        pageResult.setPageNumber(findStores.getNumber());
-        pageResult.setTotalCount(findStores.getTotalElements());
-        return pageResult;
+        return storeConverter.convertToPageResult(findStores, createPagingStore(findStores));
     }
 
     private List<StoresReadResult> createPagingStore(Page<Store> findStores) {
@@ -69,7 +63,6 @@ public class StoreService {
     public StoreReadResult getStore(Long storeId) {
         Store findStore = storeRepository.findStoreById(storeId)
                 .orElseThrow(() -> new BusinessException(STORE_NOT_FOUND));
-        getMenuResult(findStore);
         return storeConverter.convertToStoreInfoAtDetail(findStore, getBestMenuResults(storeId), getMenuResult(findStore));
     }
 
