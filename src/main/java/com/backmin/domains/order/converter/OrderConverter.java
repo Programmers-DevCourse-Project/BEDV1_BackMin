@@ -5,6 +5,7 @@ import com.backmin.domains.member.dto.response.MemberOrderPageResult;
 import com.backmin.domains.menu.domain.Menu;
 import com.backmin.domains.menu.dto.response.MenuReadResult;
 import com.backmin.domains.order.domain.Order;
+import com.backmin.domains.order.domain.OrderMenu;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
@@ -44,7 +45,7 @@ public class OrderConverter {
         return response;
     }
 
-    private MenuReadResult createMenuReadResult(com.backmin.domains.order.domain.OrderMenu orderMenu) {
+    private MenuReadResult createMenuReadResult(OrderMenu orderMenu) {
         MenuReadResult menuReadResult = new MenuReadResult();
         Menu menu = orderMenu.getMenu();
         menuReadResult.setMenuId(menu.getId());

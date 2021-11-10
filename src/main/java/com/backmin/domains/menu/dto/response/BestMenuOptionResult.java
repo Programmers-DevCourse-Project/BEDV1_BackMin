@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MenuOptionAtStoreDetailResult {
+public class BestMenuOptionResult {
 
     private Long optionId;
 

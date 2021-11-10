@@ -19,7 +19,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-@Component
+//@Component
 @Transactional
 public class DataSettingRunner implements ApplicationRunner {
 

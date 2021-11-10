@@ -1,21 +1,21 @@
 package com.backmin.domains.store.service;
 
+import static com.backmin.domains.common.enums.ErrorInfo.*;
+
 import com.backmin.config.exception.BusinessException;
 import com.backmin.domains.common.dto.PageResult;
 import com.backmin.domains.common.enums.ErrorInfo;
 import com.backmin.domains.menu.converter.MenuConverter;
-import com.backmin.domains.menu.converter.MenuOptionConverter;
 import com.backmin.domains.menu.domain.Menu;
 import com.backmin.domains.menu.domain.MenuRepository;
-import com.backmin.domains.menu.dto.response.MenuAtStoreDetailResult;
-import com.backmin.domains.menu.dto.response.MenuAtStoreListResult;
+import com.backmin.domains.menu.dto.response.BestMenuResult;
+import com.backmin.domains.menu.dto.response.StoreMenuReadResult;
 import com.backmin.domains.review.domain.ReviewRepository;
 import com.backmin.domains.store.converter.StoreConverter;
 import com.backmin.domains.store.domain.Store;
 import com.backmin.domains.store.domain.StoreRepository;
-import com.backmin.domains.store.dto.response.DetailStoreReadResult;
-import com.backmin.domains.store.dto.response.StoreAtDetailResult;
-import com.backmin.domains.store.dto.response.StoreAtListResult;
+import com.backmin.domains.store.dto.response.StoreReadResult;
+import com.backmin.domains.store.dto.response.StoresReadResult;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -34,79 +34,62 @@ public class StoreService {
     private final ReviewRepository reviewRepository;
     private final StoreConverter storeConverter;
     private final MenuConverter menuConverter;
-    private final MenuOptionConverter menuOptionConverter;
 
-    public PageResult<StoreAtListResult> readPagingStoresByCategoryId(Long categoryId, Pageable pageRequest) {
-        Page<Store> storePage = storeRepository.findPagingStoresByCategoryId(categoryId, pageRequest);
-
-        return createPageDtoWithStoreInfoAtList(storeRepository.findPagingStoresByCategoryId(categoryId, pageRequest));
+    /**
+     * 카테고리 Id로 해당하는 가게를 페이징 조회
+     */
+    public PageResult<StoresReadResult> getStoresByCategoryId(Long categoryId, Pageable pageRequest) {
+        return createPageResult(storeRepository.findPagingStoresByCategoryId(categoryId, pageRequest));
     }
 
-    private PageResult<StoreAtListResult> createPageDtoWithStoreInfoAtList(Page<Store> searchedStorePage) {
-        PageResult<StoreAtListResult> pageResult = new PageResult<>();
-        pageResult.setList(get(searchedStorePage));
-        pageResult.setHasNext(searchedStorePage.hasNext());
-        pageResult.setPageSize(searchedStorePage.getSize());
-        pageResult.setPageNumber(searchedStorePage.getNumber());
-        pageResult.setTotalCount(searchedStorePage.getTotalElements());
+    private PageResult<StoresReadResult> createPageResult(Page<Store> findStores) {
+        PageResult<StoresReadResult> pageResult = new PageResult<>();
+        pageResult.setList(createPagingStore(findStores));
+        pageResult.setHasNext(findStores.hasNext());
+        pageResult.setPageSize(findStores.getSize());
+        pageResult.setPageNumber(findStores.getNumber());
+        pageResult.setTotalCount(findStores.getTotalElements());
         return pageResult;
     }
 
-    public DetailStoreReadResult readDetailStore(Long storeId) {
-        Store foundStore = storeRepository.findStoreById(storeId)
-                .orElseThrow(() -> new BusinessException(ErrorInfo.STORE_NOT_FOUND));
-
-        StoreAtDetailResult storeInfo = storeConverter.convertToStoreInfoAtDetail(foundStore);
-
-        List<MenuAtStoreDetailResult> bestMenuInfos = menuRepository.findBestMenusByStore(storeId).stream()
-                .map(this::getConvertedMenuInfoAtStoreDetail)
-                .collect(Collectors.toList());
-
-        List<MenuAtStoreDetailResult> menuInfos = foundStore.getMenus().stream()
-                .map(this::getConvertedMenuInfoAtStoreDetail)
-                .collect(Collectors.toList());
-
-        DetailStoreReadResult detailStoreReadResult = new DetailStoreReadResult();
-        detailStoreReadResult.setStore(storeInfo);
-        detailStoreReadResult.setBestMenus(bestMenuInfos);
-        detailStoreReadResult.setMenus(menuInfos);
-
-        return detailStoreReadResult;
-    }
-
-    public PageResult<StoreAtListResult> searchStoresByName(String storeName, Pageable pageRequest) {
-        Page<Store> searchedStorePage = storeRepository.findStoresByNameContaining(storeName, pageRequest);
-
-        return createPageDtoWithStoreInfoAtList(storeRepository.findStoresByNameContaining(storeName, pageRequest));
-    }
-
-    private List<StoreAtListResult> get(Page<Store> searchedStorePage) {
-        return searchedStorePage.getContent().stream()
-                .map(store -> storeConverter.convertToStoreInfoAtList(
+    private List<StoresReadResult> createPagingStore(Page<Store> findStores) {
+        return findStores.getContent().stream()
+                .map(store -> storeConverter.convertStoresToStoresReadResults(
                         store,
-                        menuRepository.findBestMenusByStore(store.getId()).stream()
-                                .map(menu -> getConvertedMenuInfoAtStoreList(menu))
-                                .collect(Collectors.toList()),
+                        getBestMenuResults(store.getId()),
                         reviewRepository.getReviewAverageByStore(store.getId()),
                         reviewRepository.getReviewTotalCountByStore(store.getId())
                 ))
                 .collect(Collectors.toList());
     }
 
-    private MenuAtStoreDetailResult getConvertedMenuInfoAtStoreDetail(Menu menu) {
-        return menuConverter.convertMenuToMenuInfoAtStoreDetail(
-                menu,
-                menu.getMenuOptions().stream()
-                        .map(menuOptionConverter::convertMenuOptionToMenuOptionInfoAtStoreDetail)
-                        .collect(Collectors.toList()));
+    /**
+     * 가게 단건 조회
+     */
+    public StoreReadResult getStore(Long storeId) {
+        Store findStore = storeRepository.findStoreById(storeId)
+                .orElseThrow(() -> new BusinessException(STORE_NOT_FOUND));
+        getMenuResult(findStore);
+        return storeConverter.convertToStoreInfoAtDetail(findStore, getBestMenuResults(storeId), getMenuResult(findStore));
     }
 
-    private MenuAtStoreListResult getConvertedMenuInfoAtStoreList(Menu menu) {
-        return menuConverter.convertMenuToMenuInfoAtStoreList(
-                menu,
-                menu.getMenuOptions().stream()
-                        .map(menuOptionConverter::convertMenuOptionToMenuOptionInfoAtStoreList)
-                        .collect(Collectors.toList()));
+    private List<StoreMenuReadResult> getMenuResult(Store findStore) {
+        return findStore.getMenus().stream()
+                .map(menuConverter::convertMenuToMenuInfoAtStoreDetail)
+                .collect(Collectors.toList());
+    }
+
+    private List<BestMenuResult> getBestMenuResults(Long storeId) {
+        return menuRepository.findBestMenusByStore(storeId).stream()
+                .map(menuConverter::convertBestMenuToBestMenuResult)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 가게 이름으로 페이징 조회
+     */
+    public PageResult<StoresReadResult> getStoresByName(String storeName, Pageable pageRequest) {
+        return createPageResult(storeRepository.findStoresByNameContaining(storeName, pageRequest));
     }
 
 }

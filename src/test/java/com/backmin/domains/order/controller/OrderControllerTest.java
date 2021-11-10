@@ -27,8 +27,8 @@ import com.backmin.domains.menu.dto.request.MenuReadParam;
 import com.backmin.domains.order.domain.Order;
 import com.backmin.domains.order.domain.OrderStatus;
 import com.backmin.domains.order.domain.Payment;
-import com.backmin.domains.order.dto.request.CreateOrderParam;
-import com.backmin.domains.order.dto.request.UpdateOrderStatusParam;
+import com.backmin.domains.order.dto.request.OrderCreateParam;
+import com.backmin.domains.order.dto.request.OrderUpdateStatusParam;
 import com.backmin.domains.store.domain.Category;
 import com.backmin.domains.store.domain.Store;
 import java.util.ArrayList;
@@ -66,11 +66,11 @@ class OrderControllerTest extends BaseControllerTest {
         store.addMenu(menu);
         storeRepository.save(store);
 
-        CreateOrderParam createOrderParam = createRequest(store, member, menu, menuOption);
+        OrderCreateParam orderCreateParam = createRequest(store, member, menu, menuOption);
 
         mockMvc.perform(post("/api/v1/bm/orders")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(createOrderParam)))
+                .content(objectMapper.writeValueAsString(orderCreateParam)))
                 .andDo(print())
                 .andDo(document("order-save",
                         preprocessRequest(prettyPrint()),
@@ -95,7 +95,7 @@ class OrderControllerTest extends BaseControllerTest {
                 ));
 
         Order order = orderRepository.findAll().get(0);   // 떡복이2개 각각 당면추가
-        assertThat(order.getAddress()).isEqualTo(createOrderParam.getAddress());
+        assertThat(order.getAddress()).isEqualTo(orderCreateParam.getAddress());
         assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
         assertThat(order.getPayMent()).isEqualTo(Payment.KAKAO_PAY);
         assertThat(order.getTotalPrice()).isEqualTo(29000);
@@ -108,11 +108,11 @@ class OrderControllerTest extends BaseControllerTest {
         store.addMenu(savedMenu);
         storeRepository.save(store);
 
-        CreateOrderParam createOrderParam = createInvalidParam(savedMenu);
+        OrderCreateParam orderCreateParam = createInvalidParam(savedMenu);
 
         mockMvc.perform(post("/api/v1/bm/orders")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(objectMapper.writeValueAsString(createOrderParam)))
+                .content(objectMapper.writeValueAsString(orderCreateParam)))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("data.code", containsString(ErrorInfo.ORDER_MIN_PRICE.getCode())));
@@ -124,7 +124,7 @@ class OrderControllerTest extends BaseControllerTest {
         Order order = Order.of("주소", "요구사항", Payment.KAKAO_PAY, member, store, 1000);
         Order savedOrder = orderRepository.save(order);
 
-        UpdateOrderStatusParam request = new UpdateOrderStatusParam();
+        OrderUpdateStatusParam request = new OrderUpdateStatusParam();
         request.setEmail("tester@email.com");
         request.setPassword("123456789a!");
         request.setOrderStatus(OrderStatus.CANCELED);
@@ -162,7 +162,7 @@ class OrderControllerTest extends BaseControllerTest {
 
         Order savedOrder = orderRepository.save(order);
 
-        UpdateOrderStatusParam request = new UpdateOrderStatusParam();
+        OrderUpdateStatusParam request = new OrderUpdateStatusParam();
         request.setEmail("tester@email.com");
         request.setPassword("123456789a!");
         request.setOrderStatus(OrderStatus.DELIVERED);
@@ -184,7 +184,7 @@ class OrderControllerTest extends BaseControllerTest {
 
         Order savedOrder = orderRepository.save(order);
 
-        UpdateOrderStatusParam request = new UpdateOrderStatusParam();
+        OrderUpdateStatusParam request = new OrderUpdateStatusParam();
         request.setEmail("owner@email.com");
         request.setPassword("123456789a!");
         request.setOrderStatus(OrderStatus.DELIVERED);
@@ -270,7 +270,7 @@ class OrderControllerTest extends BaseControllerTest {
                 .build());
     }
 
-    private CreateOrderParam createRequest(Store saveStore, Member saveMember, Menu saveMenu, MenuOption saveMenuOption) {
+    private OrderCreateParam createRequest(Store saveStore, Member saveMember, Menu saveMenu, MenuOption saveMenuOption) {
         MenuOptionReadParam menuOptionDto = new MenuOptionReadParam();
         menuOptionDto.setId(saveMenuOption.getId());
 
@@ -285,15 +285,15 @@ class OrderControllerTest extends BaseControllerTest {
         List<MenuReadParam> menuReadParams = new ArrayList<>();
         menuReadParams.add(menuReadParam);
 
-        CreateOrderParam createOrderParam = new CreateOrderParam();
-        createOrderParam.setAddress("서울시 건대");
-        createOrderParam.setMemberId(saveMember.getId());
-        createOrderParam.setRequirement("요구사항");
-        createOrderParam.setPayment(Payment.KAKAO_PAY);
-        createOrderParam.setPassword("123456789a!");
-        createOrderParam.setStoreId(saveStore.getId());
-        createOrderParam.setMenuReadParams(menuReadParams);
-        return createOrderParam;
+        OrderCreateParam orderCreateParam = new OrderCreateParam();
+        orderCreateParam.setAddress("서울시 건대");
+        orderCreateParam.setMemberId(saveMember.getId());
+        orderCreateParam.setRequirement("요구사항");
+        orderCreateParam.setPayment(Payment.KAKAO_PAY);
+        orderCreateParam.setPassword("123456789a!");
+        orderCreateParam.setStoreId(saveStore.getId());
+        orderCreateParam.setMenuReadParams(menuReadParams);
+        return orderCreateParam;
     }
 
     private Store givenSavedStore(Member owner) {
@@ -323,8 +323,8 @@ class OrderControllerTest extends BaseControllerTest {
         return memberRepository.save(owner);
     }
 
-    private CreateOrderParam createInvalidParam(Menu savedMenu) {
-        CreateOrderParam createOrderParam = new CreateOrderParam();
+    private OrderCreateParam createInvalidParam(Menu savedMenu) {
+        OrderCreateParam orderCreateParam = new OrderCreateParam();
 
         MenuReadParam menuReadParam = new MenuReadParam();
         menuReadParam.setId(savedMenu.getId());
@@ -334,13 +334,13 @@ class OrderControllerTest extends BaseControllerTest {
         List<MenuReadParam> menuReadParams = new ArrayList<>();
         menuReadParams.add(menuReadParam);
 
-        createOrderParam.setAddress("서울시 건대");
-        createOrderParam.setMemberId(member.getId());
-        createOrderParam.setRequirement("요구사항");
-        createOrderParam.setPayment(Payment.KAKAO_PAY);
-        createOrderParam.setPassword("123456789a!");
-        createOrderParam.setStoreId(store.getId());
-        createOrderParam.setMenuReadParams(menuReadParams);
-        return createOrderParam;
+        orderCreateParam.setAddress("서울시 건대");
+        orderCreateParam.setMemberId(member.getId());
+        orderCreateParam.setRequirement("요구사항");
+        orderCreateParam.setPayment(Payment.KAKAO_PAY);
+        orderCreateParam.setPassword("123456789a!");
+        orderCreateParam.setStoreId(store.getId());
+        orderCreateParam.setMenuReadParams(menuReadParams);
+        return orderCreateParam;
     }
 }

@@ -16,7 +16,7 @@ import com.backmin.domains.order.domain.OrderMenu;
 import com.backmin.domains.order.domain.OrderMenuOption;
 import com.backmin.domains.order.domain.OrderRepository;
 import com.backmin.domains.order.domain.OrderStatus;
-import com.backmin.domains.order.dto.request.CreateOrderParam;
+import com.backmin.domains.order.dto.request.OrderCreateParam;
 import com.backmin.domains.store.domain.Store;
 import com.backmin.domains.store.domain.StoreRepository;
 import java.util.List;
@@ -37,7 +37,7 @@ public class OrderService {
     private final OrderConverter orderConverter;
 
     @Transactional
-    public void saveOrder(CreateOrderParam request) {
+    public void saveOrder(OrderCreateParam request) {
         Member member = findMember(request.getMemberId());
         Store store = findStore(request.getStoreId());
         Order order = Order.of(request.getAddress(), request.getRequirement(), request.getPayment(), member, store, store.getDeliveryTip());
@@ -54,7 +54,7 @@ public class OrderService {
         return storeRepository.findById(storeId).orElseThrow(() -> new BusinessException(ErrorInfo.STORE_NOT_FOUND));
     }
 
-    private void addOrderMenuToOrder(CreateOrderParam request, Order order, List<Menu> menus) {
+    private void addOrderMenuToOrder(OrderCreateParam request, Order order, List<Menu> menus) {
         for (MenuReadParam menuReadParam : request.getMenuReadParams()) {
             Menu menu = searchMenu(menus, menuReadParam.getId());
             OrderMenu orderMenu = OrderMenu.of(menu, menu.getPrice(), menuReadParam.getQuantity());

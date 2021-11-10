@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class MenuAtStoreDetailResult {
+public class BestMenuResult {
 
     private Long id;
 
@@ -22,6 +22,6 @@ public class MenuAtStoreDetailResult {
 
     private int price;
 
-    private List<MenuOptionAtStoreDetailResult> menuOptions;
+    private List<BestMenuOptionResult> menuOptions;
 
 }

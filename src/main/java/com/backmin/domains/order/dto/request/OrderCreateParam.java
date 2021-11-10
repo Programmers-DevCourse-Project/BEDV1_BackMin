@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateOrderParam {
+public class OrderCreateParam {
 
     @NotNull
     private Long memberId;

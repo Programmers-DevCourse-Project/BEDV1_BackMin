@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UpdateOrderStatusParam {
+public class OrderUpdateStatusParam {
 
     @NotNull
     private Long memberId;

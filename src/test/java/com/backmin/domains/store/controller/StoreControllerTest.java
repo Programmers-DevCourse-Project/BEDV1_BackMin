@@ -1,5 +1,8 @@
 package com.backmin.domains.store.controller;
 
+import static com.backmin.domains.store.controller.StoreController.CATEGORIES;
+import static com.backmin.domains.store.controller.StoreController.STORES;
+import static com.backmin.domains.store.controller.StoreController.STORE_ID;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
@@ -42,7 +45,6 @@ class StoreControllerTest extends BaseControllerTest {
 
     @BeforeEach
     void setUp() {
-
         category = categoryRepository.save(
                 Category.builder()
                         .name("한식")
@@ -112,10 +114,9 @@ class StoreControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("카테고리 별 가게 목록 조회 테스트")
     void test_list() throws Exception {
-        mockMvc.perform(get("/api/v1/bm/categories/{categoryId}/stores", category.getId())
+        mockMvc.perform(get(STORES + CATEGORIES, category.getId())
                 .param("page", String.valueOf(0))
-                .param("size", String.valueOf(10))
-                .contentType(MediaType.APPLICATION_JSON))
+                .param("size", String.valueOf(10)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("success").value(true))
                 .andExpect(jsonPath("data").exists())
@@ -171,12 +172,11 @@ class StoreControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("가게 상세조회 테스트")
     void test_detail() throws Exception {
-        mockMvc.perform(get("/api/v1/bm/stores/{storeId}", store1.getId())
+        mockMvc.perform(get(STORES + STORE_ID, store1.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("success").value(true))
                 .andExpect(jsonPath("data").exists())
-                .andExpect(jsonPath("data.store").exists())
                 .andExpect(jsonPath("data.bestMenus").exists())
                 .andExpect(jsonPath("data.menus").exists())
                 .andExpect(jsonPath("serverDatetime").exists())
@@ -188,16 +188,15 @@ class StoreControllerTest extends BaseControllerTest {
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("성공여부"),
                                 fieldWithPath("serverDatetime").type(JsonFieldType.STRING).description("서버 응답 시간"),
                                 fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional(),
-                                fieldWithPath("data.store").type(JsonFieldType.OBJECT).description("가게"),
-                                fieldWithPath("data.store.storeId").type(JsonFieldType.NUMBER).description("가게 Id"),
-                                fieldWithPath("data.store.storeName").type(JsonFieldType.STRING).description("가게명"),
-                                fieldWithPath("data.store.phoneNumber").type(JsonFieldType.STRING).description("가게전화번호"),
-                                fieldWithPath("data.store.storeIntro").type(JsonFieldType.STRING).description("가게소개"),
-                                fieldWithPath("data.store.minOrderPrice").type(JsonFieldType.NUMBER).description("최소주문금액"),
-                                fieldWithPath("data.store.deliveryTip").type(JsonFieldType.NUMBER).description("배달팁"),
-                                fieldWithPath("data.store.minDeliveryTime").type(JsonFieldType.NUMBER).description("최소배달시간"),
-                                fieldWithPath("data.store.maxDeliveryTime").type(JsonFieldType.NUMBER).description("최대배달시간"),
-                                fieldWithPath("data.store.package").type(JsonFieldType.BOOLEAN).description("포장가능여부"),
+                                fieldWithPath("data.storeId").type(JsonFieldType.NUMBER).description("가게 Id"),
+                                fieldWithPath("data.storeName").type(JsonFieldType.STRING).description("가게명"),
+                                fieldWithPath("data.phoneNumber").type(JsonFieldType.STRING).description("가게전화번호"),
+                                fieldWithPath("data.storeIntro").type(JsonFieldType.STRING).description("가게소개"),
+                                fieldWithPath("data.minOrderPrice").type(JsonFieldType.NUMBER).description("최소주문금액"),
+                                fieldWithPath("data.deliveryTip").type(JsonFieldType.NUMBER).description("배달팁"),
+                                fieldWithPath("data.minDeliveryTime").type(JsonFieldType.NUMBER).description("최소배달시간"),
+                                fieldWithPath("data.maxDeliveryTime").type(JsonFieldType.NUMBER).description("최대배달시간"),
+                                fieldWithPath("data.package").type(JsonFieldType.BOOLEAN).description("포장가능여부"),
                                 fieldWithPath("data.bestMenus").type(JsonFieldType.ARRAY).description("대표메뉴목록"),
                                 fieldWithPath("data..bestMenus[].id").type(JsonFieldType.NUMBER).description("메뉴Id"),
                                 fieldWithPath("data..bestMenus[].name").type(JsonFieldType.STRING).description("메뉴명"),
@@ -228,7 +227,7 @@ class StoreControllerTest extends BaseControllerTest {
     @Test
     @DisplayName("가게 이름으로 검색 테스트")
     void test_search() throws Exception {
-        mockMvc.perform(get("/api/v1/bm/stores")
+        mockMvc.perform(get(STORES)
                 .param("keyword", "동대문")
                 .param("page", String.valueOf(0))
                 .param("size", String.valueOf(10))

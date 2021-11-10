@@ -3,15 +3,11 @@ package com.backmin.domains.order.controller;
 import com.backmin.domains.common.dto.ApiResult;
 import com.backmin.domains.common.dto.PageResult;
 import com.backmin.domains.common.enums.ErrorInfo;
-import com.backmin.domains.member.domain.Member;
-import com.backmin.domains.member.domain.MemberRepository;
 import com.backmin.domains.member.dto.response.MemberOrderPageResult;
 import com.backmin.domains.member.service.MemberService;
-import com.backmin.domains.order.dto.request.CreateOrderParam;
-import com.backmin.domains.order.dto.request.UpdateOrderStatusParam;
+import com.backmin.domains.order.dto.request.OrderCreateParam;
+import com.backmin.domains.order.dto.request.OrderUpdateStatusParam;
 import com.backmin.domains.order.service.OrderService;
-import com.backmin.domains.store.domain.Store;
-import com.backmin.domains.store.domain.StoreRepository;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -32,13 +28,13 @@ public class OrderController {
     private final MemberService memberService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiResult createOrder(@RequestBody @Valid CreateOrderParam createOrderParam) {
-        orderService.saveOrder(createOrderParam);
+    public ApiResult createOrder(@RequestBody @Valid OrderCreateParam orderCreateParam) {
+        orderService.saveOrder(orderCreateParam);
         return ApiResult.builder().success(true).build();
     }
 
     @PostMapping(path = "/{orderId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiResult updateOrderStatus(@PathVariable Long orderId, @RequestBody @Valid UpdateOrderStatusParam request) {
+    public ApiResult updateOrderStatus(@PathVariable Long orderId, @RequestBody @Valid OrderUpdateStatusParam request) {
         boolean isAuthentication = memberService.authenticateMember(request.getMemberId(), request.getEmail(), request.getPassword());
         if (isAuthentication) {
             orderService.editOrderStatus(orderId, request.getMemberId(), request.getOrderStatus());
