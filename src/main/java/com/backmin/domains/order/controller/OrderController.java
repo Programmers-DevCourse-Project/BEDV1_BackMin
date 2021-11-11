@@ -3,6 +3,7 @@ package com.backmin.domains.order.controller;
 import com.backmin.domains.common.dto.ApiResult;
 import com.backmin.domains.common.dto.PageResult;
 import com.backmin.domains.common.enums.ErrorInfo;
+import com.backmin.domains.member.domain.Member;
 import com.backmin.domains.member.dto.response.MemberOrderPageResult;
 import com.backmin.domains.member.service.MemberService;
 import com.backmin.domains.order.dto.request.OrderCreateParam;
@@ -35,12 +36,9 @@ public class OrderController {
 
     @PostMapping(path = "/{orderId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResult updateOrderStatus(@PathVariable Long orderId, @RequestBody @Valid OrderUpdateStatusParam request) {
-        boolean isAuthentication = memberService.authenticateMember(request.getMemberId(), request.getEmail(), request.getPassword());
-        if (isAuthentication) {
-            orderService.editOrderStatus(orderId, request.getMemberId(), request.getOrderStatus());
-            return ApiResult.ok();
-        }
-        return ApiResult.error(ErrorInfo.MEMBER_NOT_FOUND.getCode(), ErrorInfo.MEMBER_NOT_FOUND.getMessage());
+        Member authenticateMember = memberService.authenticateMember(request.getMemberId(), request.getEmail(), request.getPassword());
+        orderService.editOrderStatus(orderId, authenticateMember.getId(), request.getOrderStatus());
+        return ApiResult.ok();
     }
 
     @GetMapping(path = "/members/{memberId}", produces = MediaType.APPLICATION_JSON_VALUE)

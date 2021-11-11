@@ -8,10 +8,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AssertThrow {
 
-    public static void isTrue(boolean isTrue, ErrorInfo errorInfo) {
-        if (isTrue) {
+    public static void isTrue(boolean result, ErrorInfo errorInfo) {
+        if (result) {
             throw new BusinessException(errorInfo);
         }
     }
 
+    public static void isFalse(boolean result, ErrorInfo errorInfo) {
+        if (!result) {
+            throw new BusinessException(errorInfo);
+        }
+    }
 }
