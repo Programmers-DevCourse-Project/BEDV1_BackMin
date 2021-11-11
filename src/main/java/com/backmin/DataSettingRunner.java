@@ -16,11 +16,13 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-//@Component
+@Component
 @Transactional
+@Profile("dev")
 public class DataSettingRunner implements ApplicationRunner {
 
     @Autowired

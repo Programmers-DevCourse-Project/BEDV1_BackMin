@@ -1,9 +1,13 @@
 package com.backmin.domains.common.dto;
 
-import com.backmin.domains.common.enums.ErrorInfo;
-import lombok.*;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
+import com.backmin.domains.common.enums.ErrorInfo;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.LocalDateTime;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -11,6 +15,7 @@ public class ApiResult<T> {
 
     private boolean success;
 
+    @JsonInclude(NON_NULL)
     private T data;
 
     private LocalDateTime serverDatetime;

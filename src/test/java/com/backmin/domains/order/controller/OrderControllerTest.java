@@ -89,7 +89,6 @@ class OrderControllerTest extends BaseControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("상태코드"),
-                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 데이터"),
                                 fieldWithPath("serverDatetime").type(JsonFieldType.STRING).description("응답시간")
                         )
                 ));
@@ -146,7 +145,6 @@ class OrderControllerTest extends BaseControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("상태코드"),
-                                fieldWithPath("data").type(JsonFieldType.NULL).description("응답 데이터"),
                                 fieldWithPath("serverDatetime").type(JsonFieldType.STRING).description("응답시간")
                         )
                 ));

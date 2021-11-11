@@ -1,5 +1,7 @@
 package com.backmin.domains.member.service;
 
+import static com.backmin.domains.common.enums.ErrorInfo.*;
+
 import com.backmin.config.exception.BusinessException;
 import com.backmin.config.util.AssertThrow;
 import com.backmin.domains.common.dto.ApiResult;
@@ -27,8 +29,8 @@ public class MemberService {
 
     @Transactional
     public void save(MemberCreateParam memberCreateParam) {
-        AssertThrow.isTrue(memberRepository.existsByEmail(memberCreateParam.getEmail()), ErrorInfo.DUPLICATE_EMAIL);
-        AssertThrow.isTrue(memberRepository.existsByNickName(memberCreateParam.getNickName()), ErrorInfo.DUPLICATE_NICKNAME);
+        AssertThrow.isTrue(memberRepository.existsByEmail(memberCreateParam.getEmail()), DUPLICATE_EMAIL);
+        AssertThrow.isTrue(memberRepository.existsByNickName(memberCreateParam.getNickName()), DUPLICATE_NICKNAME);
         memberRepository.save(Member.of(memberCreateParam.getEmail(), memberCreateParam.getPassword(),
                 memberCreateParam.getPhoneNumber(), memberCreateParam.getNickName(), memberCreateParam.getAddress()));
     }
@@ -38,14 +40,8 @@ public class MemberService {
         if (authenticateMember(memberId, memberUpdateParam.getEmail(), memberUpdateParam.getPassword())) {
             memberRepository.findById(memberId)
                     .map(member -> memberConverter.convertUpdateDtoToMember(member, memberUpdateParam))
-                    .orElseThrow(() -> new BusinessException(ErrorInfo.MEMBER_NOT_FOUND));
+                    .orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND));
         }
-    }
-
-    @Transactional
-    public void deleteMember(Long memberId) {
-        Member foundMember = memberRepository.findById(memberId).orElseThrow(() -> new BusinessException(ErrorInfo.MEMBER_NOT_FOUND));
-        memberRepository.delete(foundMember);
     }
 
     public EmailCheckResult checkMemberEmail(String email) {
@@ -57,7 +53,7 @@ public class MemberService {
     }
 
     public boolean authenticateMember(Long memberId, String email, String password) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new BusinessException(ErrorInfo.MEMBER_NOT_FOUND));
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND));
         return member.getEmail().equals(email) && member.getPassword().equals(password);
     }
 
